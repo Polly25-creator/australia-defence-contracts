@@ -230,13 +230,19 @@ def main():
     with st.sidebar:
         st.markdown("### Settings")
 
-        # API key for LLM-powered answers
-        api_key = st.text_input(
-            "Anthropic API Key (optional)",
-            type="password",
-            help="Add your Claude API key to enable AI-generated answers. "
-                 "Without it, you'll get search results only."
-        )
+        # API key: check Streamlit Secrets first, then fall back to user input
+        secret_key = st.secrets.get("ANTHROPIC_API_KEY", "") if hasattr(st, "secrets") else ""
+
+        if secret_key:
+            api_key = secret_key
+            st.success("AI answers enabled", icon="✅")
+        else:
+            api_key = st.text_input(
+                "Anthropic API Key (optional)",
+                type="password",
+                help="Add your Claude API key to enable AI-generated answers. "
+                     "Without it, you'll get search results only."
+            )
 
         use_llm = bool(api_key)
 
@@ -364,4 +370,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
